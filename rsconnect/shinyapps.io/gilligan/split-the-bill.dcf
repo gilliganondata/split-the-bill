@@ -1,0 +1,10 @@
+name: split-the-bill
+title: Split the BillY
+username:
+account: gilligan
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 515976
+bundleId: 1645471
+url: https://gilligan.shinyapps.io/split-the-bill/
+when: 1539692931.37822
