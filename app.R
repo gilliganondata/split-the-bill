@@ -17,7 +17,7 @@ wages_data <- gs_read(wages_key)
 # Rename the columns for simpler use later. The "pre_word" is whether "the"
 # should comes before the country name (e.g. "...the disparity in Australia..." vs.
 # "...the disparity in *the* United States...")
-names(wages_data) <- c("pre_word", "country", "percent_diff", "data_source", "url")
+names(wages_data) <- c("pre_word", "country", "year", "percent_diff", "data_source", "url")
 
 # Convert the percentages to numerics
 wages_data$percent_diff <- 
@@ -40,7 +40,8 @@ ui <- fluidPage(
   
   selectizeInput("country",
                  "Choose Your Country:",
-                 choices = countries_list),
+                 choices = countries_list,
+                 selected = "United States of America"),
   numericInput("total_bill",
                "Total Bill Amount:",
                100),
@@ -78,7 +79,9 @@ server <- function(input, output) {
     
     disparity <- get_wage_disparity()  # Get the wage disparity
     
-    # Calculate the amount the men owe
+    # Calculate the amount the men owe. We're NOT going to round this
+    # to 2 decimal places here, as we want the raw number to calculate
+    # the women's amount.
     men_contribute <- input$total_bill /
       (input$men + input$women - input$women * disparity)
   })
@@ -89,8 +92,10 @@ server <- function(input, output) {
     men_amount <- get_men_amount()
     disparity <- get_wage_disparity()
     
-    # Calculate the amount the man/men should pay
-    women_amount <- men_amount - men_amount * disparity
+    # Calculate the amount the man/men should pay. Go ahead and
+    # round this to two decimal places.
+    women_amount <- (men_amount - men_amount * disparity) %>% 
+      round(2)
     
   })
   
@@ -106,12 +111,18 @@ server <- function(input, output) {
       select(pre_word) %>% 
       as.character()
     
+    # Get the year
+    year <- wages_data %>% 
+      filter(country == input$country) %>% 
+      select(year) %>% 
+      as.character()
+    
     # Add a space after the word if there is a word
     pre_word <- ifelse(is.na(pre_word), "",
                        paste0(pre_word, " "))
     
     # Create the output message
-    paste0("In ", pre_word, input$country, ", women are paid ", wage_disparity_selected,"% less than men.")
+    paste0("As of ", year, " in ", pre_word, input$country, ", women are paid ", wage_disparity_selected,"% less than men.")
   })
   
   output$data_source <- renderText({
@@ -129,14 +140,14 @@ server <- function(input, output) {
   output$men_result <- renderText({
     
     # Get the amount the man/men should pay
-    men_amount <- get_men_amount()
+    men_amount <- get_men_amount() %>% round(2)
     
     # Figure out if it's "man" or "men" and whether there should be an "each" at the end
     man_men <- ifelse(input$men == 1, "man", "men")
     sentence_end <- ifelse(input$men == 1, ".", " each.")
     
     # Concoct the string
-    paste0("The ", input$men, " ", man_men, " should pay ", round(men_amount, 2), sentence_end)
+    paste0("The ", input$men, " ", man_men, " should pay ", format(men_amount, nsmall = 2), sentence_end)
   })
   
   output$women_result <- renderText({
@@ -149,7 +160,7 @@ server <- function(input, output) {
     sentence_end <- ifelse(input$women == 1, ".", " each.")
     
     # Concoct the string.
-    paste0("The ", input$women, " ", woman_women, " should pay ", round(women_amount,2), sentence_end)
+    paste0("The ", input$women, " ", woman_women, " should pay ", format(women_amount, nsmall = 2), sentence_end)
     
   })
   
@@ -157,28 +168,27 @@ server <- function(input, output) {
   # but we'll just leave this up to the diners
   output$adjustment <- renderText({
     
-    # Calculate the total tallied up
-    men_amount <- get_men_amount()
+    # Calculate the total tallied up. The men's amount needs to be rounded
+    # to two decimal places here. The women amount already has this done in the function.
+    men_amount <- get_men_amount() %>% round(2)
     women_amount <- get_women_amount()
     
-    total_calculated <- round(men_amount, 2) * input$men + round(women_amount, 2) * input$women
+    total_calculated <- men_amount * input$men + women_amount * input$women
     
     if(total_calculated == input$total_bill){
       message <- ""
     } else {
       if(total_calculated > input$total_bill){
-        delta <- total_calculated - input$total_bill %>% round(2)
-        paste0("These numbers will result in a total that is ", round(delta, 2), 
+        delta <- (total_calculated - input$total_bill) %>% round(2)
+        paste0("These numbers will result in a total that is ", format(delta, nsmall = 2), 
                " more than the total bill, so adjust accordingly.")
       } else {
-        delta <- input$total_bill - total_calculated %>% round(2)
-        paste0("These numbers will result in a total that is ", round(delta, 2), 
+        delta <- (input$total_bill - total_calculated) %>% round(2)
+        paste0("These numbers will result in a total that is ", format(delta, nsmall = 2), 
                " LESS than the total bill, so adjust accordingly.")
       }
     }
-    
   })
-  
 }
 
 # Run the application 
