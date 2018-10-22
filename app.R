@@ -32,6 +32,15 @@ ui <- fluidPage(
   # Application title
   titlePanel("Split the Bill (Gender) Equally!"),
   
+  # Add in Google Tag Manager (if you're using this code, you should
+  # swap out the GTM-WQR7N8 value in this for your own GTM container ID. Or just
+  # delete the whole tags$head section)
+  tags$head(tags$script("(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-WQR7N8');")),
+  
   tags$em("A gender pay gap persists. To promote awareness of that fact, as well as to provide at least ",
           "a token acknowledgment of the problem, why not split the bill for your meal in a way where the women ",
           "at the table get a break on their meal cost that is proportional to their country-wide depressed income?"),
@@ -54,12 +63,23 @@ ui <- fluidPage(
   
   # Output the results
   
+  tags$hr(),
   tags$h3(textOutput("disparity_message")),
   tags$em(textOutput("data_source")),
   tags$h3(textOutput("women_result")),
   tags$h3(textOutput("men_result")),
-  tags$strong(textOutput("adjustment"))
+  tags$strong(textOutput("adjustment")),
+  tags$hr(),
   
+  # Contact details and such
+  tags$div(tags$em("This calculator was created by", tags$a(href="https://twitter.com/tgwilson", "Tim Wilson"),
+                   "as the result of a",
+          tags$a(href="https://twitter.com/MoeMKiss/status/1041574088488083456",
+                 "tweet by @MoeMKiss."))),
+  tags$div(tags$em("This calculator was built using R. The source code for is available",
+          tags$a(href="https://github.com/gilliganondata/split-the-bill", "on GitHub."),
+          "Any feedback can be posted as issues there.")),
+  tags$br()
 )
 
 # Define server logic required to draw a histogram
