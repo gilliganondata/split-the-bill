@@ -119,7 +119,6 @@ server <- function(input, output) {
     
   })
   
-  
   output$disparity_message <- renderText({
     
     # Change the wage disparity to a percentage
@@ -149,13 +148,30 @@ server <- function(input, output) {
     
     # Get the data source info
     data_source_selected <- wages_data %>% 
-      filter(country == input$country) %>% 
+      filter(country == input$country) 
+    
+    name <- data_source_selected %>% 
       select(data_source) %>% 
       as.character()
     
-    # Return the data source message
-    paste("Data Source:", data_source_selected)
+    url <- data_source_selected %>% 
+      select(url) %>% 
+      as.character()
+    
+    paste("Data Source:", name, "--", url)
+    
   })
+  
+  output$data_source_url <- renderText({
+    
+    # Get the data source info
+    data_source_url_selected <- wages_data %>% 
+      filter(country == input$country) %>% 
+      select(url) %>% 
+      as.character()
+  
+  })
+  
   
   output$men_result <- renderText({
     
