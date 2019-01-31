@@ -3,6 +3,7 @@
 # that accounts for the wage disparity in the country in which they're dining.
 
 library(shiny)
+library(shinythemes)
 library(googlesheets)
 library(tidyverse)
 
@@ -27,7 +28,14 @@ wages_data$percent_diff <-
 countries_list <- wages_data$country
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+# ui <- fluidPage(
+#                 
+#                 tags$head(
+#                   tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
+#                 ),
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(theme = shinytheme("slate"),
   
   # Application title
   titlePanel("Split the Bill (Gender) Equally!"),
