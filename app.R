@@ -11,8 +11,8 @@ library(tidyverse)
 # https://docs.google.com/spreadsheets/d/1Y5USfz5WlqK27dfw6bv4g1ZZhRkyA5NXgM1yXbPhuOU/edit?usp=sharing.
 # It's a pretty simple structure, so easy enough to duplicate should you fork this and want to 
 # make updates.
-gs_auth()
-wages_key <- gs_key("1Y5USfz5WlqK27dfw6bv4g1ZZhRkyA5NXgM1yXbPhuOU")
+wages_key <- gs_key("1Y5USfz5WlqK27dfw6bv4g1ZZhRkyA5NXgM1yXbPhuOU",
+                    lookup = FALSE)
 wages_data <- gs_read(wages_key)
 
 # Rename the columns for simpler use later. The "pre_word" is whether "the"
@@ -35,7 +35,7 @@ countries_list <- wages_data$country
 #                 ),
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(theme = shinytheme("slate"),
+ui <- fluidPage(theme = shinytheme("superhero"),
   
   # Application title
   titlePanel("Split the Bill (Gender) Equally!"),
