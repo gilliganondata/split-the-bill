@@ -7,4 +7,5 @@ library(rsconnect)
 
 # Deploy the split-the-bill calculator
 deployApp(appName = "split-the-bill",
-          appTitle = "Split the Bill")
+          appTitle = "Split the Bill",
+          account = "gilligan")

@@ -4,16 +4,19 @@
 
 library(shiny)
 library(shinythemes)
-library(googlesheets)
+library(googlesheets4)
 library(tidyverse)
+
+# Just reading from a public Google Sheet
+gs4_deauth()
 
 # Read in the values for the different countries and the wage gaps from Google Sheets. This sheet is viewable at
 # https://docs.google.com/spreadsheets/d/1Y5USfz5WlqK27dfw6bv4g1ZZhRkyA5NXgM1yXbPhuOU/edit?usp=sharing.
 # It's a pretty simple structure, so easy enough to duplicate should you fork this and want to 
 # make updates.
-wages_key <- gs_key("1Y5USfz5WlqK27dfw6bv4g1ZZhRkyA5NXgM1yXbPhuOU",
-                    lookup = FALSE)
-wages_data <- gs_read(wages_key)
+wages_key <- "1Y5USfz5WlqK27dfw6bv4g1ZZhRkyA5NXgM1yXbPhuOU"
+
+wages_data <- read_sheet(wages_key)
 
 # Rename the columns for simpler use later. The "pre_word" is whether "the"
 # should comes before the country name (e.g. "...the disparity in Australia..." vs.
@@ -22,7 +25,7 @@ names(wages_data) <- c("pre_word", "country", "year", "percent_diff", "data_sour
 
 # Convert the percentages to numerics
 wages_data$percent_diff <- 
-  as.numeric(sub("%", "", wages_data$percent_diff))/100
+  as.numeric(sub("%", "", wages_data$percent_diff))
 
 # Create the countries list for the dropdown
 countries_list <- wages_data$country
@@ -149,7 +152,7 @@ server <- function(input, output) {
                        paste0(pre_word, " "))
     
     # Create the output message
-    paste0("As of ", year, " in ", pre_word, input$country, ", women are paid ", wage_disparity_selected,"% less than men.")
+    paste0("As of ", year, " in ", pre_word, input$country, ", women are paid ", round(wage_disparity_selected, 1),"% less than men.")
   })
   
   output$data_source <- renderText({
